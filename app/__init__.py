@@ -57,8 +57,8 @@ app.router.routes[:]=[r for r in app.router.routes if getattr(r,'path',None) not
 @app.get('/')
 async def home_v82():
     html=(base.ROOT/'static'/'index.html').read_text(encoding='utf-8')
-    html=html.replace('</head>',"<link rel='stylesheet' href='/static/v82.css?v=2'><link rel='stylesheet' href='/static/v83.css?v=3'><link rel='stylesheet' href='/static/v84_ai.css?v=1'><link rel='stylesheet' href='/static/v85_brain.css?v=1'></head>")
-    html=html.replace('</body>',"<script src='/static/v82.js?v=2'></script><script src='/static/v83.js?v=3'></script><script src='/static/v84_ai.js?v=1'></script><script src='/static/v85_brain.js?v=1'></script></body>")
+    html=html.replace('</head>',"<link rel='stylesheet' href='/static/v82.css?v=2'><link rel='stylesheet' href='/static/v83.css?v=3'><link rel='stylesheet' href='/static/v84_ai.css?v=1'><link rel='stylesheet' href='/static/v85_brain.css?v=1'><link rel='stylesheet' href='/static/v86_hypothesis.css?v=1'></head>")
+    html=html.replace('</body>',"<script src='/static/v82.js?v=2'></script><script src='/static/v83.js?v=3'></script><script src='/static/v84_ai.js?v=1'></script><script src='/static/v85_brain.js?v=1'></script><script src='/static/v86_hypothesis.js?v=1'></script></body>")
     return HTMLResponse(html,headers={'Cache-Control':'no-store, max-age=0'})
 
 @app.post('/api/auth/signup')
@@ -118,3 +118,5 @@ def admin_balance_v82(user_id:int,req:BalanceV82,request:Request):
 
 from .purple_ai import register as register_purple_ai
 register_purple_ai(app,base)
+from .v86_hypothesis import register as register_v86_hypothesis
+register_v86_hypothesis(app,base)
