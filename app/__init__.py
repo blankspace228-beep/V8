@@ -56,7 +56,10 @@ app.router.routes[:]=[r for r in app.router.routes if getattr(r,'path',None) not
 
 @app.get('/')
 async def home_v82():
-    html=(base.ROOT/'static'/'index.html').read_text(encoding='utf-8');html=html.replace('</head>',"<link rel='stylesheet' href='/static/v82.css?v=2'></head>");html=html.replace('</body>',"<script src='/static/v82.js?v=2'></script></body>");return HTMLResponse(html,headers={'Cache-Control':'no-store, max-age=0'})
+    html=(base.ROOT/'static'/'index.html').read_text(encoding='utf-8')
+    html=html.replace('</head>',"<link rel='stylesheet' href='/static/v82.css?v=2'><link rel='stylesheet' href='/static/v83.css?v=3'><link rel='stylesheet' href='/static/v84_ai.css?v=1'></head>")
+    html=html.replace('</body>',"<script src='/static/v82.js?v=2'></script><script src='/static/v83.js?v=3'></script><script src='/static/v84_ai.js?v=1'></script></body>")
+    return HTMLResponse(html,headers={'Cache-Control':'no-store, max-age=0'})
 
 @app.post('/api/auth/signup')
 async def signup_v82(req:SignupV82,response:Response):
@@ -112,3 +115,6 @@ def admin_balance_v82(user_id:int,req:BalanceV82,request:Request):
     acct=conn.execute('SELECT * FROM user_accounts WHERE user_id=?',(user_id,)).fetchone();old=float(acct['cash']);new=float(req.cash);conn.execute('UPDATE user_accounts SET cash=? WHERE user_id=?',(new,user_id))
     if float(acct['starting_cash'])==0 and conn.execute('SELECT COUNT(*) c FROM user_trades WHERE user_id=?',(user_id,)).fetchone()['c']==0:conn.execute('UPDATE user_accounts SET starting_cash=? WHERE user_id=?',(new,user_id))
     conn.execute('INSERT INTO admin_balance_audit(actor_user_id,target_user_id,old_cash,new_cash,reason,created_at) VALUES(?,?,?,?,?,?)',(actor['id'],user_id,old,new,(req.reason or 'Owner correction').strip(),base.now_iso()));conn.commit();conn.close();return {'ok':True,'account':base.account_snapshot(user_id)}
+
+from .purple_ai import register as register_purple_ai
+register_purple_ai(app,base)
