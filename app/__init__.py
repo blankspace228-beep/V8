@@ -57,8 +57,8 @@ app.router.routes[:]=[r for r in app.router.routes if getattr(r,'path',None) not
 @app.get('/')
 async def home_v82():
     html=(base.ROOT/'static'/'index.html').read_text(encoding='utf-8')
-    html=html.replace('</head>',"<link rel='stylesheet' href='/static/v82.css?v=2'><link rel='stylesheet' href='/static/v83.css?v=3'><link rel='stylesheet' href='/static/v84_ai.css?v=1'><link rel='stylesheet' href='/static/v85_brain.css?v=1'><link rel='stylesheet' href='/static/v86_hypothesis.css?v=1'><link rel='stylesheet' href='/static/v87_attention.css?v=1'><link rel='stylesheet' href='/static/v88_global_attention.css?v=1'><link rel='stylesheet' href='/static/v89_router.css?v=1'><link rel='stylesheet' href='/static/v90_imagination.css?v=1'></head>")
-    html=html.replace('</body>',"<script src='/static/v82.js?v=2'></script><script src='/static/v83.js?v=3'></script><script src='/static/v84_ai.js?v=1'></script><script src='/static/v85_brain.js?v=1'></script><script src='/static/v86_hypothesis.js?v=1'></script><script src='/static/v87_attention.js?v=1'></script><script src='/static/v88_global_attention.js?v=1'></script><script src='/static/v89_router.js?v=1'></script><script src='/static/v90_imagination.js?v=1'></script></body>")
+    html=html.replace('</head>',"<link rel='stylesheet' href='/static/v82.css?v=2'><link rel='stylesheet' href='/static/v83.css?v=3'><link rel='stylesheet' href='/static/v84_ai.css?v=1'><link rel='stylesheet' href='/static/v85_brain.css?v=1'><link rel='stylesheet' href='/static/v86_hypothesis.css?v=1'><link rel='stylesheet' href='/static/v87_attention.css?v=1'><link rel='stylesheet' href='/static/v88_global_attention.css?v=1'><link rel='stylesheet' href='/static/v89_router.css?v=1'><link rel='stylesheet' href='/static/v90_imagination.css?v=1'><link rel='stylesheet' href='/static/v91_trading_floor.css?v=1'></head>")
+    html=html.replace('</body>',"<script src='/static/v82.js?v=2'></script><script src='/static/v83.js?v=3'></script><script src='/static/v84_ai.js?v=1'></script><script src='/static/v85_brain.js?v=1'></script><script src='/static/v86_hypothesis.js?v=1'></script><script src='/static/v87_attention.js?v=1'></script><script src='/static/v88_global_attention.js?v=1'></script><script src='/static/v89_router.js?v=1'></script><script src='/static/v90_imagination.js?v=1'></script><script src='/static/v91_trading_floor.js?v=1'></script></body>")
     return HTMLResponse(html,headers={'Cache-Control':'no-store, max-age=0'})
 
 @app.post('/api/auth/signup')
@@ -128,3 +128,5 @@ from .v89_hierarchical import register as register_v89_hierarchical
 register_v89_hierarchical(app,base)
 from .v90_imagination import register as register_v90_imagination
 register_v90_imagination(app,base)
+from .v91_trading_floor import register as register_v91_trading_floor
+register_v91_trading_floor(app,base)
