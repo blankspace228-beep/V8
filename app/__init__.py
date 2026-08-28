@@ -136,3 +136,5 @@ from .v94_market_coin import register as register_v94_coin
 register_v94_coin(app,base)
 from .v95_economy_security import register as register_v95_security
 register_v95_security(app,base)
+from .v96_persistent_core import register as register_v96_persistent
+register_v96_persistent(app,base)
