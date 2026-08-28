@@ -1,0 +1,34 @@
+(()=>{
+  const q=s=>document.querySelector(s), qa=s=>[...document.querySelectorAll(s)];
+  const money=n=>Number(n||0).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2});
+  const esc2=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  const actions=q('.top-actions');
+  if(actions&&!q('#topLogoutBtn')){const b=document.createElement('button');b.id='topLogoutBtn';b.className='top-logout';b.textContent='LOG OUT';b.onclick=()=>q('#logoutBtn')?.click();actions.insertBefore(b,actions.children[1]||null)}
+  const oldRender=renderIdentity;
+  renderIdentity=function(){oldRender();q('#topLogoutBtn')?.classList.toggle('hidden',!state.user)};
+
+  const form=q('#authForm');
+  if(form&&!q('#authEmail')){
+    const password=q('#authPassword').closest('label');
+    const lab=document.createElement('label');lab.id='authEmailWrap';lab.className='hidden';lab.innerHTML='Email<input id="authEmail" type="email" maxlength="254" autocomplete="email" placeholder="you@example.com">';form.insertBefore(lab,password);
+    const verify=document.createElement('div');verify.id='verifyCodeWrap';verify.className='hidden';verify.innerHTML='<label>Verification code<input id="verifyCode" inputmode="numeric" maxlength="6" placeholder="6-digit code"></label><button id="verifyEmailBtn" class="secondary-button full" type="button">VERIFY EMAIL</button>';form.insertBefore(verify,q('#authMessage'));
+  }
+  const oldMode=setAuthMode;
+  setAuthMode=function(mode){oldMode(mode);const e=q('#authEmailWrap'),inp=q('#authEmail');if(e)e.classList.toggle('hidden',mode!=='signup');if(inp)inp.required=mode==='signup'&&q('#ownerSetupCodeWrap')?.classList.contains('hidden');q('#verifyCodeWrap')?.classList.add('hidden')};
+
+  if(form){const clone=form.cloneNode(true);form.replaceWith(clone);clone.addEventListener('submit',async e=>{e.preventDefault();const username=q('#authUsername').value.trim(),password=q('#authPassword').value,btn=q('#authSubmit');btn.disabled=true;setAuthMessage(state.authMode==='login'?'Signing in…':'Creating account…');try{const endpoint=state.authMode==='login'?'/api/auth/login':'/api/auth/signup';const payload={username,password};if(state.authMode==='signup'){payload.email=q('#authEmail')?.value.trim()||'';if(!q('#ownerSetupCodeWrap')?.classList.contains('hidden'))payload.setup_code=q('#ownerSetupCode').value}const d=await api(endpoint,{method:'POST',body:JSON.stringify(payload)});if(d.verification_required){state.pendingVerifyUser=username;q('#verifyCodeWrap').classList.remove('hidden');btn.disabled=true;setAuthMessage(`Verification code sent to ${d.email}. Enter it below.`,'good');return}state.user=d.user;renderIdentity();closeAuth();q('#authPassword').value='';if(!window.__purpleStarted)await initApp();else await refreshAccountConsole()}catch(err){setAuthMessage(err.message,'bad')}finally{if(!state.pendingVerifyUser){btn.disabled=false;btn.textContent=state.authMode==='login'?'LOG IN':'CREATE ACCOUNT'}}});}
+  q('#verifyEmailBtn')?.addEventListener('click',async()=>{const code=q('#verifyCode').value.trim();if(!state.pendingVerifyUser||code.length!==6)return setAuthMessage('Enter the 6-digit verification code.','bad');try{const d=await api('/api/auth/verify-email',{method:'POST',body:JSON.stringify({username:state.pendingVerifyUser,code})});state.pendingVerifyUser=null;state.user=d.user;renderIdentity();closeAuth();if(!window.__purpleStarted)await initApp();else await refreshAccountConsole()}catch(e){setAuthMessage(e.message,'bad')}});
+
+  refreshAccountConsole=async function(){
+    renderIdentity();refreshNetworkStatus();const u=state.user;if(!u)return;const box=q('#ownerConsole'),canView=(rolePower[u.role]||0)>=rolePower.moderator;box.classList.toggle('hidden',!canView);if(!canView)return;
+    try{const d=await api('/api/admin/users'),list=q('#userAdminList');list.innerHTML='';d.users.forEach(x=>{const row=document.createElement('div');row.className='admin-user admin-user-v82';const canRoles=(rolePower[u.role]||0)>=rolePower.admin,protectedTarget=x.role==='owner'&&u.role!=='owner',owner=u.role==='owner';const options=d.roles.map(r=>`<option value="${r}" ${r===x.role?'selected':''}>${r.toUpperCase()}</option>`).join('');row.innerHTML=`<div class="admin-user-main"><span class="staff-role ${roleClass(x.role)}">${esc2(x.role_label)}</span><div><strong>${esc2(x.username)}</strong><small>${x.email?esc2(x.email)+(x.email_verified?' • VERIFIED':' • UNVERIFIED'):'Legacy account • no email'}<br>${x.last_login_at?'Last login '+new Date(x.last_login_at).toLocaleString():'No login recorded yet'}</small></div></div><div class="admin-metrics"><span>Fake cash<b>${money(x.cash)}</b></span><span>Equity<b>${money(x.equity)}</b></span><span>Trade volume<b>${money(x.trade_volume)}</b></span><span>Trades / positions<b>${x.trade_count||0} / ${x.position_count||0}</b></span></div><div class="admin-controls"><select class="role-select" data-id="${x.id}" ${(!canRoles||protectedTarget)?'disabled':''}>${options}</select><button class="account-toggle ${x.is_active?'danger':''}" data-active-id="${x.id}">${x.is_active?'DISABLE':'ENABLE'}</button>${owner?`<div class="balance-edit"><input data-balance-id="${x.id}" type="number" min="0" step="1000" value="${Number(x.cash||0).toFixed(2)}"><button class="secondary-button" data-balance-save="${x.id}">SET CASH</button></div>`:''}</div>`;list.appendChild(row)});
+    qa('.role-select').forEach(sel=>sel.onchange=async()=>{try{await api(`/api/admin/users/${sel.dataset.id}/role`,{method:'POST',body:JSON.stringify({role:sel.value})});await refreshAccountConsole()}catch(e){alert(e.message)}});
+    qa('[data-active-id]').forEach(btn=>btn.onclick=async()=>{const x=d.users.find(v=>String(v.id)===btn.dataset.activeId);try{await api(`/api/admin/users/${btn.dataset.activeId}/active`,{method:'POST',body:JSON.stringify({is_active:!x.is_active})});await refreshAccountConsole()}catch(e){alert(e.message)}});
+    qa('[data-balance-save]').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.balanceSave,cash=Number(q(`[data-balance-id="${id}"]`).value);if(!Number.isFinite(cash)||cash<0)return alert('Enter a valid fake cash balance.');if(!confirm(`Set this account's fake cash to ${money(cash)}? This is audit-logged.`))return;try{await api(`/api/admin/users/${id}/balance`,{method:'POST',body:JSON.stringify({cash,reason:'Owner anti-cheat correction'})});await refreshAccountConsole()}catch(e){alert(e.message)}})
+    }catch(e){console.error(e);box.classList.add('hidden')}
+  };
+
+  const note=q('#ownerConsole .owner-note');if(note)note.textContent='Review each account’s fake cash, equity, total traded volume, trades, and positions. Owner cash corrections are permission-checked and audit-logged on the server.';
+  renderIdentity();
+})();
