@@ -2,10 +2,21 @@ from pathlib import Path
 import base64, zipfile, shutil
 
 ROOT = Path(__file__).resolve().parent
-parts = []
-for i in range(1, 8):
-    parts.append((ROOT / f"emtready-build/payload.b64.{i:03d}").read_text(encoding="utf-8").strip())
-
+names = [
+    "payload.b64.001",
+    "payload.b64.002",
+    "payload.b64.003",
+    "payload.b64.004",
+    "payload.b64.005",
+    "payload.b64.006a",
+    "payload.b64.006b00",
+    "payload.b64.006b01",
+    "payload.b64.006b02",
+    "payload.b64.006b03",
+    "payload.b64.006b04",
+    "payload.b64.007",
+]
+parts = [(ROOT / "emtready-build" / name).read_text(encoding="utf-8").strip() for name in names]
 raw = base64.b64decode("".join(parts))
 zip_path = ROOT / "emtready_source.zip"
 zip_path.write_bytes(raw)
