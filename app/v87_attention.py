@@ -73,7 +73,6 @@ def register(app, base):
         spawned=[]
         def add(name,label,activation,reason,kind):
             if activation>=58:spawned.append({'id':name,'label':label,'activation':round(clamp(activation),1),'reason':reason,'kind':kind,'ttl_seconds':ASSEMBLY_TTL_SECONDS})
-        # Assemblies are created only when salience justifies them; otherwise they do not exist.
         add('trend_acceleration','Trend Acceleration',50+abs(f['trend_gap'])*9+max(0,abs(f['momentum_5'])-.4)*7,'Trend and recent momentum are unusually directional.','opportunity')
         breakout_pressure=(f['range_position']-.72)*110+max(0,f['volume_ratio']-1)*18+50
         add('breakout_pressure','Breakout Pressure',breakout_pressure,'Price is near the recent range edge with supporting activity.','opportunity')
@@ -121,3 +120,6 @@ def register(app, base):
     @app.get('/api/ai/attention-memory')
     async def attention_memory(request:Request):
         uid=base.current_user_id(request);ensure_tables();conn=base.db();memory=[dict(r) for r in conn.execute('SELECT * FROM user_ai_attention_memory WHERE user_id=? ORDER BY updated_at DESC LIMIT 30',(uid,)).fetchall()];events=[dict(r) for r in conn.execute('SELECT * FROM user_ai_attention_events WHERE user_id=? ORDER BY id DESC LIMIT 16',(uid,)).fetchall()];conn.close();return {'engine':'Purple Dynamic Attention Mesh V8.7','memory':memory,'recent_events':events}
+
+    from .v88_global_attention import register as register_v88_global_attention
+    register_v88_global_attention(app,base)
