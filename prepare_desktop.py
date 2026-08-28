@@ -120,8 +120,8 @@ pkg = {
   "license":"UNLICENSED",
   "scripts": {
     "start":"electron .",
-    "dist:win":"electron-builder --win nsis portable --x64",
-    "dist:mac":"electron-builder --mac dmg zip --universal"
+    "dist:win":"electron-builder --win nsis portable --x64 --publish never",
+    "dist:mac":"electron-builder --mac dmg zip --universal --publish never"
   },
   "build": {
     "appId":"com.guardready.ca.desktop",
