@@ -1,4 +1,4 @@
-import os,hmac,secrets
+import os,hmac,hashlib
 from fastapi import HTTPException,Request,Response
 from pydantic import BaseModel,Field
 
@@ -22,7 +22,7 @@ def register(app,base):
         ensure();c=base.db();lock=c.execute('SELECT * FROM owner_server_lock WHERE id=1').fetchone();owners=c.execute("SELECT id,username FROM users WHERE role='owner' ORDER BY id").fetchall();c.close()
         return {'reserved_username':RESERVED,'claimed':bool(lock or owners),'locked_to':(lock['bound_username'] if lock else (owners[0]['username'] if owners else None)),'owner_count':len(owners)}
 
-    # Replace signup: all accounts begin as PLAYER. Owner is claimed only after login.
+    # All normal signups start as Player. Owner elevation happens only from Account settings.
     app.router.routes[:]=[r for r in app.router.routes if getattr(r,'path',None)!='/api/auth/signup']
 
     class Signup(BaseModel):
@@ -36,9 +36,7 @@ def register(app,base):
         username=req.username.strip();c=base.db()
         if not username.replace('_','').replace('-','').isalnum():c.close();raise HTTPException(400,'Username may use letters, numbers, underscores, and hyphens')
         if c.execute('SELECT 1 FROM users WHERE username=?',(username,)).fetchone():c.close();raise HTTPException(409,'Username already exists')
-        email=(req.email or '').strip().lower() or None
-        reserved=(username.casefold()==RESERVED_N)
-        # Reserved Owner candidate may create first and claim later; normal accounts keep existing verification behavior.
+        email=(req.email or '').strip().lower() or None;reserved=(username.casefold()==RESERVED_N)
         if not reserved and os.getenv('EMAIL_VERIFICATION_REQUIRED','1').lower() in {'1','true','yes','on'}:
             if not email or '@' not in email or email.startswith('@') or email.endswith('@'):c.close();raise HTTPException(400,'A valid email is required for player accounts')
         salt,ph=base._new_password(req.password)
@@ -61,11 +59,12 @@ def register(app,base):
         ensure();c=base.db()
         try:
             c.execute('BEGIN IMMEDIATE');lock=c.execute('SELECT * FROM owner_server_lock WHERE id=1').fetchone();owners=c.execute("SELECT id,username FROM users WHERE role='owner'").fetchall()
-            if lock and lock['claimed_user_id']!=u['id']:raise HTTPException(409,f"This server's Owner slot is permanently bound to {lock['bound_username']}.")
+            if lock and lock['bound_username'].casefold()!=RESERVED_N:raise HTTPException(409,'This server Owner slot is already permanently bound.')
+            if lock and int(lock['claimed_user_id'])!=int(u['id']):raise HTTPException(409,f"This server's Owner slot is permanently bound to {lock['bound_username']}.")
             if any(int(x['id'])!=int(u['id']) for x in owners):raise HTTPException(409,'This server already has an Owner account. Owner access cannot be transferred.')
-            fp=__import__('hashlib').sha256(base.OWNER_SETUP_CODE.encode()).hexdigest()[:16]
+            fp=hashlib.sha256(base.OWNER_SETUP_CODE.encode()).hexdigest()[:16]
             c.execute("UPDATE users SET role='owner',email_verified=1 WHERE id=?",(u['id'],))
-            c.execute('INSERT OR IGNORE INTO owner_server_lock(id,bound_username,claimed_user_id,claimed_at,code_fingerprint) VALUES(1,?,?,?,?,?)',(RESERVED,u['id'],base.now_iso(),fp))
+            c.execute('INSERT OR IGNORE INTO owner_server_lock(id,bound_username,claimed_user_id,claimed_at,code_fingerprint) VALUES(1,?,?,?,?)',(RESERVED,u['id'],base.now_iso(),fp))
             acct=c.execute('SELECT * FROM user_accounts WHERE user_id=?',(u['id'],)).fetchone()
             if acct and float(acct['cash'])==0 and c.execute('SELECT COUNT(*) n FROM user_trades WHERE user_id=?',(u['id'],)).fetchone()['n']==0:
                 c.execute('UPDATE user_accounts SET cash=?,starting_cash=? WHERE user_id=?',(base.STARTING_CASH,base.STARTING_CASH,u['id']))
@@ -73,8 +72,6 @@ def register(app,base):
         except HTTPException:c.rollback();raise
         except Exception:c.rollback();raise
         finally:c.close()
-        # refresh session after elevation
-        base.create_session(request.scope.get('_response') if False else Response(),u['id'])
         try:
             if hasattr(base,'v96_mirror_user'):base.v96_mirror_user(u['id'])
         except Exception:pass
