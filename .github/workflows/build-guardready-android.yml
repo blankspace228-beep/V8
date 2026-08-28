@@ -42,6 +42,9 @@ jobs:
           mkdir android-project
           unzip -q GuardReady-Android.zip -d android-project
 
+      - name: Apply mobile left-drawer navigation update
+        run: python3 patch_mobile_nav.py android-project/app/src/main/assets/index.html
+
       - name: Pin compatible Android build toolchain
         working-directory: android-project
         run: |
