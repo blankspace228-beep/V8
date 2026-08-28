@@ -94,7 +94,6 @@ def register(app,base):
         minted=int(sup['minted']);burned=int(sup['burned']);reserve=int(res['balance']) if res else 0;held=int(wallets['n'] or 0);expected=minted-burned;actual=held+reserve;delta=actual-expected;ok=(delta==0 and minted<=int(sup['max_supply']) and burned<=minted and held>=0 and reserve>=0)
         return {'ok':ok,'hard_cap':int(sup['max_supply']),'minted':minted,'burned':burned,'expected_circulating':expected,'wallet_balances':held,'exchange_reserve':reserve,'accounted_supply':actual,'delta':delta,'freeze_recommended':not ok}
 
-    # Restore durable account automatically before rejecting a login.
     login_paths=[r for r in app.router.routes if getattr(r,'path',None)=='/api/auth/login']
     original_login=login_paths[-1].endpoint if login_paths else None
     if original_login:
@@ -126,3 +125,7 @@ def register(app,base):
         base.require_role(request,'owner');s=base.db();a=audit();wallets=[dict(x) for x in s.execute('''SELECT u.username,w.balance,w.lifetime_earned,w.lifetime_burned,w.highest_rewarded_level FROM user_purple_currency w JOIN users u ON u.id=w.user_id ORDER BY w.balance DESC LIMIT 100''').fetchall()];flags=[dict(x) for x in s.execute('''SELECT u.username,f.kind,f.detail,f.created_at FROM purple_coin_flags f LEFT JOIN users u ON u.id=f.user_id ORDER BY f.id DESC LIMIT 100''').fetchall()];ledger=[dict(x) for x in s.execute('''SELECT u.username,l.delta,l.reason,l.level,l.trade_count,l.created_at FROM purple_currency_ledger l LEFT JOIN users u ON u.id=l.user_id ORDER BY l.id DESC LIMIT 100''').fetchall()];s.close();return {'audit':a,'wallets':wallets,'flags':flags,'ledger':ledger,'postgres_configured':bool(URL and pg)}
 
     base.v96_mirror_user=mirror_user;base.v96_restore=restore_from_pg;base.v96_audit=audit
+
+    # V9.7: post-login one-time Owner claim, permanently bound to reserved username.
+    from .v97_owner_claim import register as register_v97_owner_claim
+    register_v97_owner_claim(app,base)
