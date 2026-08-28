@@ -16,7 +16,7 @@ jobs:
       - name: Prepare GuardReady desktop source
         run: python prepare_desktop.py
       - name: Install Electron packager
-        run: npm install --no-audit --no-fund electron@latest electron-builder@latest
+        run: npm install --save-dev --no-audit --no-fund electron@latest electron-builder@latest
       - name: Build Windows installer and portable app
         run: npm run dist:win
         env:
@@ -47,7 +47,7 @@ jobs:
       - name: Prepare GuardReady desktop source
         run: python3 prepare_desktop.py
       - name: Install Electron packager
-        run: npm install --no-audit --no-fund electron@latest electron-builder@latest
+        run: npm install --save-dev --no-audit --no-fund electron@latest electron-builder@latest
       - name: Build universal macOS app
         run: npm run dist:mac
         env:
