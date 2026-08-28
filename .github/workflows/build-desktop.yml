@@ -1,8 +1,8 @@
-name: Build GuardReady Desktop Apps
+name: Build EMTReady NREMT Beta
 
 on:
   push:
-    branches: [guardready-desktop-build]
+    branches: [emtready-nremt-beta]
   workflow_dispatch:
 
 jobs:
@@ -13,11 +13,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Prepare GuardReady desktop source
+      - name: Prepare EMTReady desktop source
         run: python prepare_desktop.py
       - name: Install Electron packager
         run: npm install --save-dev --no-audit --no-fund electron@latest electron-builder@latest
-      - name: Build Windows installer and portable app
+      - name: Build Windows beta
         run: npm run dist:win
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
@@ -26,15 +26,15 @@ jobs:
         run: |
           $installer = Get-ChildItem dist -Filter "*.exe" | Where-Object { $_.Name -match "Setup" } | Select-Object -First 1
           $portable = Get-ChildItem dist -Filter "*.exe" | Where-Object { $_.Name -notmatch "Setup" } | Select-Object -First 1
-          if ($installer) { Copy-Item $installer.FullName "dist/GuardReady_CA_Windows_Setup.exe" }
-          if ($portable) { Copy-Item $portable.FullName "dist/GuardReady_CA_Windows_Portable.exe" }
+          if ($installer) { Copy-Item $installer.FullName "dist/EMTReady_NREMT_Beta_Windows_Setup.exe" }
+          if ($portable) { Copy-Item $portable.FullName "dist/EMTReady_NREMT_Beta_Windows_Portable.exe" }
       - name: Upload Windows downloads
         uses: actions/upload-artifact@v4
         with:
-          name: GuardReady-CA-Windows
+          name: EMTReady-NREMT-Beta-Windows
           path: |
-            dist/GuardReady_CA_Windows_Setup.exe
-            dist/GuardReady_CA_Windows_Portable.exe
+            dist/EMTReady_NREMT_Beta_Windows_Setup.exe
+            dist/EMTReady_NREMT_Beta_Windows_Portable.exe
           if-no-files-found: error
 
   macos:
@@ -44,11 +44,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Prepare GuardReady desktop source
+      - name: Prepare EMTReady desktop source
         run: python3 prepare_desktop.py
       - name: Install Electron packager
         run: npm install --save-dev --no-audit --no-fund electron@latest electron-builder@latest
-      - name: Build universal macOS app
+      - name: Build universal macOS beta
         run: npm run dist:mac
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
@@ -56,13 +56,13 @@ jobs:
         run: |
           DMG=$(find dist -maxdepth 1 -name '*.dmg' | head -1)
           ZIP=$(find dist -maxdepth 1 -name '*.zip' | head -1)
-          test -n "$DMG" && cp "$DMG" dist/GuardReady_CA_macOS_Universal.dmg
-          test -n "$ZIP" && cp "$ZIP" dist/GuardReady_CA_macOS_Universal.zip
+          test -n "$DMG" && cp "$DMG" dist/EMTReady_NREMT_Beta_macOS_Universal.dmg
+          test -n "$ZIP" && cp "$ZIP" dist/EMTReady_NREMT_Beta_macOS_Universal.zip
       - name: Upload Mac downloads
         uses: actions/upload-artifact@v4
         with:
-          name: GuardReady-CA-macOS
+          name: EMTReady-NREMT-Beta-macOS
           path: |
-            dist/GuardReady_CA_macOS_Universal.dmg
-            dist/GuardReady_CA_macOS_Universal.zip
+            dist/EMTReady_NREMT_Beta_macOS_Universal.dmg
+            dist/EMTReady_NREMT_Beta_macOS_Universal.zip
           if-no-files-found: error
