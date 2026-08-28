@@ -31,7 +31,7 @@ html = html.replace(
 )
 (ROOT / "index.html").write_text(html, encoding="utf-8")
 
-# Create a clean GuardReady shield/check PNG with no external Python packages.
+# Create a 512x512 GuardReady shield/check PNG with no external Python packages.
 def in_poly(x, y, pts):
     inside = False
     j = len(pts) - 1
@@ -52,7 +52,7 @@ def dist_seg(px, py, ax, ay, bx, by):
     t = c1/c2
     return math.hypot(px-(ax+t*vx), py-(ay+t*vy))
 
-S=256
+S=512
 outer=[(128,10),(224,46),(208,171),(128,242),(48,171),(32,46)]
 inner=[(128,28),(207,58),(193,161),(128,220),(63,161),(49,58)]
 mid=[(128,44),(189,68),(179,151),(128,199),(77,151),(67,68)]
@@ -60,14 +60,15 @@ rows=[]
 for y in range(S):
     row=bytearray([0])
     for x in range(S):
+        xx, yy = x/2.0, y/2.0
         rgba=(0,0,0,0)
-        if in_poly(x,y,outer): rgba=(13,118,255,255)
-        if in_poly(x,y,inner): rgba=(5,24,57,255)
-        if in_poly(x,y,mid): rgba=(21,107,222,255)
-        if dist_seg(x,y,86,125,112,151) <= 8 or dist_seg(x,y,112,151,171,91) <= 8:
+        if in_poly(xx,yy,outer): rgba=(13,118,255,255)
+        if in_poly(xx,yy,inner): rgba=(5,24,57,255)
+        if in_poly(xx,yy,mid): rgba=(21,107,222,255)
+        if dist_seg(xx,yy,86,125,112,151) <= 8 or dist_seg(xx,yy,112,151,171,91) <= 8:
             rgba=(255,255,255,255)
-        if 91 <= x <= 165 and 177 <= y <= 184: rgba=(58,226,215,255)
-        if 101 <= x <= 155 and 188 <= y <= 195: rgba=(58,226,215,255)
+        if 91 <= xx <= 165 and 177 <= yy <= 184: rgba=(58,226,215,255)
+        if 101 <= xx <= 155 and 188 <= yy <= 195: rgba=(58,226,215,255)
         row.extend(rgba)
     rows.append(bytes(row))
 
