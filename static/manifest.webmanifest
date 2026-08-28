@@ -1,0 +1,10 @@
+{
+  "name": "Purple Paper Trading Simulator",
+  "short_name": "Purple Paper",
+  "description": "Live-market paper trading simulator using fake money.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08070b",
+  "theme_color": "#08070b",
+  "icons": []
+}

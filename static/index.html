@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#09070d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Purple Paper">
+  <title>Purple Paper V7 — Owner Console</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="app-shell" id="appShell">
+  <aside class="sidebar">
+    <div class="brand-lockup"><div class="brand-mark">P</div><div><b>PURPLE</b><span>PAPER</span></div></div>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <button class="nav-item active" data-view="game"><span>◈</span>Game</button>
+      <button class="nav-item" data-view="trade"><span>⌁</span>Trade</button>
+      <button class="nav-item" data-view="crypto"><span>₿</span>Crypto</button>
+      <button class="nav-item" data-view="portfolio"><span>◫</span>Portfolio</button>
+      <button class="nav-item" data-view="orders"><span>⇅</span>Orders</button>
+      <button class="nav-item" data-view="journal"><span>✎</span>Journal</button>
+      <button class="nav-item" data-view="coach"><span>✦</span>Coach</button>
+      <button class="nav-item" data-view="account"><span>♛</span>Account</button>
+    </nav>
+    <div class="simulation-badge"><i></i><div><strong>SIMULATION</strong><small>No real money connected</small></div></div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="mobile-brand"><div class="brand-mark small">P</div><b>PURPLE PAPER</b></div>
+      <div class="market-status"><span id="sessionPill" class="session-pill">Market status</span><span id="statusDot" class="status-dot"></span><span id="statusText">Connecting…</span></div>
+      <div class="top-actions"><button id="userChip" class="user-chip" type="button"><span id="userRoleMini">GUEST</span><b id="userNameMini">Sign in</b></button><button id="soundToggle" class="icon-button sound-toggle" type="button" title="Career sounds on" aria-label="Toggle career sounds">🔊</button><button id="dataSetupBtn" class="data-button" type="button"><i></i><span>MARKET DATA</span></button><button id="resetBtn" class="icon-button" title="Reset practice account" aria-label="Reset practice account">↻</button></div>
+    </header>
+
+    <main>
+      <section class="view active" data-view-panel="game">
+        <div class="game-hero card">
+          <div class="game-hero-copy"><span class="eyebrow">PURPLE PAPER V6 • TRADER TIERS + ADAPTIVE COACH</span><h1>Trading Arena</h1><p>Live stock and 24/7 crypto practice with fake money, career progression, professional achievement celebrations, prop-style objectives, and AI review.</p><div class="rank-line"><span id="gameRank" class="rank-badge">ROOKIE</span><span id="gameLevel">Level 1</span></div></div>
+          <div class="xp-orbit"><div class="xp-ring"><strong id="gameXP">0</strong><small>XP</small></div><span id="gameNext">100 XP to next level</span></div>
+        </div>
+        <section class="game-stat-grid">
+          <div class="card game-stat"><span>Portfolio</span><strong id="gEquity">$0.00</strong><small id="gPL">0.00% total</small></div>
+          <div class="card game-stat"><span>Discipline</span><strong id="gDiscipline">—</strong><small>AI practice score</small></div>
+          <div class="card game-stat"><span>Completed missions</span><strong id="gMissions">0/5</strong><small>Current career set</small></div>
+          <div class="card game-stat"><span>Paper trades</span><strong id="gTrades">0</strong><small>Filled orders</small></div>
+        </section>
+        <section class="tier-economy-grid">
+          <article class="card trader-tier-card">
+            <div class="section-title"><div><span class="eyebrow">TRADER TIER</span><h2 id="tierName">Starter</h2></div><span id="tierVolume" class="tier-volume">$0 traded</span></div>
+            <div class="tier-progress"><i id="tierProgress"></i></div>
+            <div class="tier-meta"><span id="tierNext">Trade $100,000 to reach Bronze Desk</span><b id="tierPerk">Standard XP and core coach analysis</b></div>
+            <div id="tierTrack" class="tier-track"></div>
+          </article>
+          <article class="card practice-store-card">
+            <div class="section-title"><div><span class="eyebrow">PRACTICE CREDIT STORE</span><h2>Non-redeemable training cash</h2></div><span class="safe-pill">SIMULATOR ONLY</span></div>
+            <p class="store-note">Preview economy for the game. These packs never cash out and this build does not process payments.</p>
+            <div id="practicePacks" class="practice-pack-grid"></div>
+          </article>
+        </section>
+        <div class="game-layout">
+          <section class="card mission-card"><div class="section-title"><div><span class="eyebrow">CAREER MISSIONS</span><h2>Train like it matters</h2></div><button class="secondary-button jump-view" data-target="trade">Open trading desk</button></div><div id="gameMissionsList" class="mission-list"></div></section>
+          <section class="card achievement-card"><div class="section-title"><div><span class="eyebrow">ACHIEVEMENTS</span><h2>Badge cabinet</h2></div></div><div id="gameBadges" class="badge-grid"></div></section>
+        </div>
+        <div class="v4-game-grid">
+          <section class="card prop-card">
+            <div class="section-title"><div><span class="eyebrow">PROP-STYLE CHALLENGE</span><h2>$100K Evaluation</h2></div><span id="propStatus" class="paper-tag">ACTIVE</span></div>
+            <p class="prop-copy">Practice reaching a profit target while respecting simulated drawdown and concentration rules.</p>
+            <div class="prop-progress-list">
+              <div><span>Profit target +8%</span><strong id="propProfit">0.00%</strong><i><b id="propProfitBar"></b></i></div>
+              <div><span>Max drawdown floor −5%</span><strong id="propDrawdown">0.00%</strong><i><b id="propDrawdownBar"></b></i></div>
+              <div><span>Closed trades 20</span><strong id="propTrades">0/20</strong><i><b id="propTradesBar"></b></i></div>
+              <div><span>Largest position ≤25%</span><strong id="propRisk">—</strong><i><b id="propRiskBar"></b></i></div>
+            </div>
+          </section>
+          <section class="card report-card">
+            <div class="section-title"><div><span class="eyebrow">SESSION REPORT</span><h2>Desk grade</h2></div><button id="refreshReport" class="ghost-button" type="button">Refresh</button></div>
+            <div class="report-grade"><strong id="reportGrade">—</strong><div><b id="reportLabel">Building sample</b><span id="reportFeed">Market feed status</span></div></div>
+            <div class="report-mini"><div><span>Fills</span><b id="reportFills">0</b></div><div><span>Win rate</span><b id="reportWin">—</b></div><div><span>Journal</span><b id="reportJournal">0</b></div></div>
+          </section>
+        </div>
+        <section class="card arena-card"><div class="arena-copy"><span class="eyebrow">NEXT MOVE</span><h2 id="arenaTitle">Make your first paper trade</h2><p id="arenaText">Choose a live symbol, decide your risk, and place a fake-money order. Purple Coach will review your behavior after fills.</p></div><button class="trade-button jump-view" data-target="trade">ENTER MARKET</button></section>
+      </section>
+
+      <section class="view" data-view-panel="crypto">
+        <div class="crypto-page-head">
+          <div><span class="eyebrow">PURPLE CRYPTO • 24/7 PAPER MARKET</span><h1>Crypto Arena</h1><p>Browse Alpaca's currently supported USD crypto pairs, watch live quotes, and practice with the same fake account as your stock portfolio.</p></div>
+          <div class="crypto-live-box"><span id="cryptoLivePill" class="crypto-live-pill">CONNECTING</span><small id="cryptoConnectionText">Connecting crypto feed…</small></div>
+        </div>
+        <section class="crypto-metrics">
+          <div class="card crypto-metric"><span>Crypto exposure</span><strong id="cryptoExposure">$0.00</strong><small>Current paper positions</small></div>
+          <div class="card crypto-metric"><span>Crypto positions</span><strong id="cryptoPositions">0</strong><small>Open pairs</small></div>
+          <div class="card crypto-metric"><span>Fake cash</span><strong id="cryptoCash">$0.00</strong><small>Shared with stocks</small></div>
+          <div class="card crypto-metric"><span>USD pairs</span><strong id="cryptoPairCount">—</strong><small id="cryptoCatalogState">Loading current catalog…</small></div>
+        </section>
+        <div class="crypto-layout">
+          <section class="card crypto-market-card">
+            <div class="crypto-toolbar"><div><span class="eyebrow">LIVE CRYPTO CATALOG</span><h2>24/7 Markets</h2></div><input id="cryptoSearch" type="search" placeholder="Search BTC, ETH, SOL…" autocomplete="off"></div>
+            <div class="crypto-feature-row">
+              <button type="button" data-crypto-quick="BTC/USD"><span>₿</span><b>Bitcoin</b><small>BTC/USD</small></button>
+              <button type="button" data-crypto-quick="ETH/USD"><span>Ξ</span><b>Ethereum</b><small>ETH/USD</small></button>
+              <button type="button" data-crypto-quick="SOL/USD"><span>S</span><b>Solana</b><small>SOL/USD</small></button>
+            </div>
+            <div id="cryptoAssets" class="crypto-assets"></div>
+          </section>
+          <aside class="card crypto-spotlight">
+            <div class="crypto-spot-head"><div><span class="eyebrow">SELECTED CRYPTO</span><h2 id="cryptoSpotSymbol">BTC/USD</h2></div><span class="paper-tag">PAPER</span></div>
+            <div class="crypto-big-price" id="cryptoSpotPrice">—</div>
+            <small id="cryptoSpotFresh">Waiting for first quote</small>
+            <div class="crypto-quote-grid"><div><span>BID</span><strong id="cryptoSpotBid">—</strong></div><div><span>ASK</span><strong id="cryptoSpotAsk">—</strong></div></div>
+            <div class="crypto-24-note"><b>24/7 MARKET</b><span>Crypto does not follow the U.S. stock session clock. Purple Paper can receive crypto updates around the clock when Alpaca is connected.</span></div>
+            <button id="cryptoTradeSelected" class="trade-button" type="button" disabled>OPEN PAPER TRADE</button>
+            <div class="safe-note"><b>Simulation only</b><span>Real market data, fake cash, fake crypto positions. Purple Paper does not send a crypto order to Alpaca.</span></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" data-view-panel="trade">
+        <section class="hero-metrics">
+          <div class="metric-main"><span>Portfolio value</span><strong id="equity">$0.00</strong><small id="totalPL">$0.00 (0.00%) all time</small></div>
+          <div class="metric"><span>Buying power</span><strong id="cash">$0.00</strong></div>
+          <div class="metric"><span>Invested</span><strong id="marketValue">$0.00</strong></div>
+          <div class="metric"><span>Realized P/L</span><strong id="realizedPL">$0.00</strong></div>
+        </section>
+
+        <div class="trade-layout">
+          <section class="market-card card">
+            <div class="symbol-row">
+              <div class="symbol-title"><div class="ticker-badge" id="tickerBadge">A</div><div><span class="eyebrow">SELECTED ASSET</span><h1 id="activeSymbol">AAPL</h1><small id="companyHint">Live market simulation</small></div></div>
+              <div class="quote-block"><strong id="activePrice">—</strong><small id="activeSpread">Bid — / Ask —</small></div>
+            </div>
+
+            <div class="timeframe-row">
+              <div class="chart-controls"><div class="timeframes" id="timeframes"><button class="active" data-timeframe="1Min">1D</button><button data-timeframe="5Min">5D</button><button data-timeframe="15Min">1M</button></div><div class="chart-modes" id="chartModes"><button class="active" data-chart="candles">Candles</button><button data-chart="line">Line</button></div></div>
+              <span id="chartRange" class="chart-range">Live</span>
+            </div>
+            <div class="chart-wrap"><canvas id="chart"></canvas><div id="chartEmpty" class="chart-empty"><div class="chart-empty-inner"><strong id="chartEmptyTitle">Waiting for live market data…</strong><span id="chartEmptyText">Connect a market-data feed to load real prices.</span><button id="chartSetupBtn" type="button">SET UP LIVE DATA</button></div></div></div>
+
+            <div class="depth-strip">
+              <div><span>BID</span><strong id="bidPrice">—</strong><small id="bidSize">— shares</small></div>
+              <div class="spread-meter"><span>SPREAD</span><div><i></i></div><strong id="spreadValue">—</strong></div>
+              <div class="right"><span>ASK</span><strong id="askPrice">—</strong><small id="askSize">— shares</small></div>
+            </div>
+
+            <div class="feed-strip"><div><span>DATA FEED</span><strong id="feedName">Checking…</strong></div><div><span>QUOTE STATE</span><strong id="quoteState">Waiting</strong></div><div><span>LAST UPDATE</span><strong id="quoteAge">—</strong></div></div>
+            <div class="watch-toolbar"><div class="section-title"><div><span class="eyebrow">WATCHLIST</span><h2>Markets</h2></div></div><form id="tickerForm" class="ticker-form"><input id="tickerInput" maxlength="12" autocomplete="off" placeholder="Search ticker"><button>Add</button></form></div>
+            <div id="watchlist" class="watchlist"></div>
+          </section>
+
+          <aside class="order-card card">
+            <div class="order-title"><div><span class="eyebrow">ORDER TICKET</span><h2>Practice trade</h2></div><span class="paper-tag">PAPER</span></div>
+            <div class="side-toggle"><button class="side active" data-side="buy">BUY</button><button class="side" data-side="sell">SELL</button></div>
+            <div class="form-grid">
+              <label>Symbol<input id="orderSymbol" value="AAPL" maxlength="24" autocomplete="off"></label>
+              <label>Order type<select id="orderType"><option value="market">Market</option><option value="limit">Limit</option><option value="stop">Stop</option><option value="stop_limit">Stop limit</option></select></label>
+              <label id="limitRow" class="conditional hidden">Limit price<input id="limitPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></label>
+              <label id="stopRow" class="conditional hidden">Stop price<input id="stopPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></label>
+              <label id="qtyLabel">Shares<input id="qty" type="number" min="0.0001" step="0.0001" inputmode="decimal" value="1"></label>
+            </div>
+            <div class="quick-qty"><button type="button" data-q="0.25">¼ share</button><button type="button" data-q="1">1</button><button type="button" data-q="5">5</button><button type="button" data-q="10">10</button></div>
+            <div class="risk-planner"><div class="risk-head"><div><span class="eyebrow">POSITION SIZER</span><b>Risk planner</b></div><span id="riskBudgetText">1.0% risk</span></div><div class="risk-grid"><label>Risk %<input id="riskPct" type="number" min="0.1" max="10" step="0.1" value="1" inputmode="decimal"></label><label>Planned stop<input id="plannedStop" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal"></label></div><button type="button" id="sizeByRisk" class="sizer-button">Calculate shares from risk</button><small id="riskHint">Enter a planned stop to size a trade by account risk.</small></div>
+            <div class="order-summary"><div><span>Estimated value</span><strong id="estimate">—</strong></div><div><span>Simulated slippage</span><strong>2 bps</strong></div><div><span>Live quote</span><strong id="ticketQuote">—</strong></div></div>
+            <button id="placeOrder" class="trade-button">Review BUY order</button>
+            <p id="orderMessage" class="message" aria-live="polite"></p>
+            <div class="safe-note"><b>Practice mode only</b><span>Orders exist only in this simulator. No brokerage trade is submitted.</span></div>
+          </aside>
+        </div>
+
+        <section class="card compact-card mobile-trade-summary"><div class="section-title"><div><span class="eyebrow">OPEN POSITIONS</span><h2>Your holdings</h2></div><button class="text-button jump-view" data-target="portfolio">View all</button></div><div id="positionCards" class="position-cards"></div></section>
+      </section>
+
+      <section class="view" data-view-panel="portfolio">
+        <div class="page-head"><div><span class="eyebrow">PORTFOLIO</span><h1>Performance</h1><p>Track exposure, unrealized gains, and the effect of each position on your fake account.</p></div></div>
+        <section class="hero-metrics portfolio-metrics"><div class="metric-main"><span>Total equity</span><strong id="pEquity">$0.00</strong><small id="pTotalPL">—</small></div><div class="metric"><span>Cash</span><strong id="pCash">$0.00</strong></div><div class="metric"><span>Unrealized</span><strong id="unrealizedPL">$0.00</strong></div><div class="metric"><span>Realized</span><strong id="pRealizedPL">$0.00</strong></div></section>
+        <section class="card"><div class="section-title"><div><span class="eyebrow">POSITIONS</span><h2>Current holdings</h2></div></div><div class="table-wrap"><table><thead><tr><th>Asset</th><th>Shares</th><th>Avg cost</th><th>Last</th><th>Market value</th><th>Return</th></tr></thead><tbody id="positions"></tbody></table></div></section>
+      </section>
+
+      <section class="view" data-view-panel="orders">
+        <div class="page-head"><div><span class="eyebrow">ACTIVITY</span><h1>Orders & fills</h1><p>Review simulated order execution, trigger prices, fills, and realized outcomes.</p></div><button id="refreshOrders" class="secondary-button">Refresh</button></div>
+        <div class="orders-grid"><section class="card"><div class="section-title"><div><span class="eyebrow">ORDERS</span><h2>Order history</h2></div></div><div id="orderCards" class="mobile-list"></div><div class="table-wrap desktop-table"><table><thead><tr><th>ID</th><th>Asset</th><th>Side</th><th>Type</th><th>Qty</th><th>Trigger</th><th>Fill</th><th>Status</th><th></th></tr></thead><tbody id="orders"></tbody></table></div></section></div>
+      </section>
+
+      <section class="view" data-view-panel="journal">
+        <div class="page-head"><div><span class="eyebrow">TRADE JOURNAL</span><h1>Review your decisions</h1><p>Write down the setup, thesis, emotion, and lesson so you can improve the process instead of chasing outcomes.</p></div></div>
+        <div class="journal-grid"><form id="journalForm" class="card journal-form"><label>Title<input id="journalTitle" maxlength="100" placeholder="Why I entered this trade" required></label><label>Symbol (optional)<input id="journalSymbol" maxlength="12" placeholder="AAPL"></label><label>Mindset<select id="journalMood"><option value="calm">Calm</option><option value="confident">Confident</option><option value="neutral" selected>Neutral</option><option value="uncertain">Uncertain</option><option value="fomo">FOMO</option></select></label><label>Notes<textarea id="journalBody" maxlength="4000" rows="8" placeholder="Entry reason, invalidation point, what happened, and what you would change…" required></textarea></label><button class="trade-button">Save journal entry</button></form><section class="card"><div class="section-title"><div><span class="eyebrow">ENTRIES</span><h2>Recent notes</h2></div></div><div id="journalEntries" class="journal-entries"></div></section></div>
+      </section>
+
+      <section class="view" data-view-panel="coach">
+        <div class="page-head"><div><span class="eyebrow">PURPLE AI COACH • V8</span><h1>Your trading practice analyst</h1><p>Analyzes your simulator data, explains patterns, and reviews fills. It never places trades or controls real money.</p></div><button id="refreshCoach" class="secondary-button">Analyze again</button></div><div class="coach-trust-banner"><span>ⓘ</span><div><b>YOU MAKE THE FINAL TRADE DECISION</b><small>Purple Coach can make mistakes, miss context, or misread market conditions. Treat its analysis as decision support—not certainty.</small></div></div>
+        <section class="coach-score-grid">
+          <div class="card coach-score"><span>Practice risk score</span><strong id="coachRiskScore">—</strong><small id="coachRiskLabel">Building sample</small></div>
+          <div class="card coach-score"><span>Win rate</span><strong id="coachWinRate">—</strong><small id="coachClosedTrades">0 closed trades</small></div>
+          <div class="card coach-score"><span>Profit factor</span><strong id="coachProfitFactor">—</strong><small>Gross wins ÷ gross losses</small></div>
+          <div class="card coach-score"><span>Largest position</span><strong id="coachConcentration">—</strong><small id="coachLargestSymbol">No positions</small></div>
+        </section>
+        <div class="coach-v3-layout">
+          <section class="card coach-chat-card">
+            <div class="coach-chat-head"><div class="coach-orb">✦</div><div><span class="eyebrow">PURPLE COACH</span><h2>Ask about your trading</h2></div><button id="clearCoach" class="ghost-button" type="button">Clear</button></div>
+            <div id="coachChat" class="coach-chat" aria-live="polite"><div class="coach-bubble coach"><b>Purple Coach</b><p>Ask me about your risk, win rate, losses, concentration, order execution, or journaling. I analyze only your paper-trading account.</p></div></div>
+            <div class="coach-prompts"><button type="button" data-coach-prompt="Analyze my risk">Analyze my risk</button><button type="button" data-coach-prompt="How am I performing?">My performance</button><button type="button" data-coach-prompt="Review my recent losses">Recent losses</button><button type="button" data-coach-prompt="Check my concentration">Position sizing</button></div>
+            <form id="coachForm" class="coach-form"><input id="coachInput" maxlength="1000" autocomplete="off" placeholder="Ask Purple Coach about your paper account…" aria-label="Message Purple Coach"><button type="submit">Send</button></form>
+            <small class="coach-disclaimer">Purple Coach can make mistakes or miss context. It never submits orders; you make the final decision.</small>
+          </section>
+          <div class="coach-side-stack">
+            <section class="card"><div class="section-title"><div><span class="eyebrow">LIVE ANALYSIS</span><h2>Behavioral observations</h2></div></div><div id="coachInsights" class="coach-insights coach-insights-v3"></div></section>
+            <section class="card"><div class="section-title"><div><span class="eyebrow">POST-TRADE AI</span><h2>Automatic fill reviews</h2></div></div><div id="coachReviews" class="coach-reviews"><div class="coach-review"><small>No fills reviewed yet.</small></div></div></section>
+          </div>
+        </div>
+        <section class="card adaptive-coach-card"><div class="section-title"><div><span class="eyebrow">ADAPTIVE COACH PROFILE</span><h2>Behavior pattern engine</h2></div><span id="adaptiveCoachState" class="safe-pill">LIVE MODEL</span></div><div class="adaptive-metrics"><div><span>Avg ticket</span><strong id="adaptiveAvgTicket">—</strong></div><div><span>Loss streak</span><strong id="adaptiveLossStreak">—</strong></div><div><span>Advanced orders</span><strong id="adaptiveAdvanced">—</strong></div><div><span>Top symbol share</span><strong id="adaptiveTopShare">—</strong></div></div><div id="adaptiveCoachInsights" class="coach-insights coach-insights-v3"></div><small class="coach-disclaimer">Purple Coach adapts to your simulated behavior and market-risk context. Its analysis is fallible and should be checked before you act.</small></section>
+        <section class="card challenge-card"><div class="section-title"><div><span class="eyebrow">PRACTICE CHALLENGES</span><h2>Build discipline</h2></div></div><div class="challenge-grid"><div><b>Risk Awareness</b><span>Keep any single position under 25% of equity.</span><small id="challengeConcentration">Waiting for positions</small></div><div><b>Use the Journal</b><span>Write one entry after every meaningful trade.</span><small id="challengeJournal">0 entries</small></div><div><b>Advanced Orders</b><span>Practice one limit or stop order.</span><small id="challengeOrders">Not completed</small></div></div></section>
+      </section>
+
+      <section class="view" data-view-panel="account">
+        <div class="page-head"><div><span class="eyebrow">PURPLE PAPER ACCOUNT</span><h1>Account & Staff Console</h1><p>Your sign-in identity, staff rank, and management tools for the Purple Paper community.</p></div><button id="logoutBtn" class="secondary-button" type="button">Log out</button></div>
+        <section class="account-rank-hero card">
+          <div class="account-avatar">♛</div>
+          <div><span class="eyebrow">SIGNED IN AS</span><h2 id="accountUsername">—</h2><div class="role-line"><span id="accountRoleBadge" class="staff-role player">PLAYER</span><span id="accountRoleDescription">Standard trader account</span></div></div>
+          <div class="account-security"><b>SERVER-BACKED LOGIN</b><span>Passwords are salted and hashed. Your portfolio, XP, badges, journal, and role are tied to this account on the Purple Paper server.</span></div>
+        </section>
+        <section class="card network-card"><div class="section-title"><div><span class="eyebrow">PURPLE PAPER NETWORK</span><h2>Hosted account status</h2></div><span id="networkMode" class="safe-pill">CHECKING</span></div><div class="network-metrics"><div><span>Account storage</span><strong id="networkScope">Server-backed</strong></div><div><span>Registered users</span><strong id="networkUsers">—</strong></div><div><span>Current role</span><strong id="networkRole">—</strong></div></div><p id="networkMessage" class="owner-note">Checking server-backed account storage…</p></section>
+        <section id="staffRankGuide" class="card staff-guide">
+          <div class="section-title"><div><span class="eyebrow">STAFF HIERARCHY</span><h2>Community ranks</h2></div></div>
+          <div class="staff-rank-grid">
+            <div><span class="staff-role owner">OWNER</span><b>Owner</b><small>Full platform control, staff management, protected owner account.</small></div>
+            <div><span class="staff-role admin">ADMIN</span><b>Administrator</b><small>Manage roles below Owner and platform operations.</small></div>
+            <div><span class="staff-role moderator">MOD</span><b>Moderator</b><small>Review users and enable or disable standard accounts.</small></div>
+            <div><span class="staff-role coach">COACH</span><b>Coach / Staff</b><small>Recognized training and community support rank.</small></div>
+            <div><span class="staff-role player">PLAYER</span><b>Player</b><small>Normal Purple Paper trader account.</small></div>
+          </div>
+        </section>
+        <section id="ownerConsole" class="card owner-console hidden">
+          <div class="section-title"><div><span class="eyebrow">OWNER / STAFF CONSOLE</span><h2>User management</h2></div><span class="staff-role owner">PROTECTED</span></div>
+          <p class="owner-note">Owner and staff tools are permission-checked by the server. UI changes alone cannot grant a rank.</p>
+          <div id="userAdminList" class="user-admin-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation"><button class="nav-item active" data-view="game"><span>◈</span><small>Game</small></button><button class="nav-item" data-view="trade"><span>⌁</span><small>Trade</small></button><button class="nav-item" data-view="crypto"><span>₿</span><small>Crypto</small></button><button class="nav-item" data-view="portfolio"><span>◫</span><small>Portfolio</small></button><button class="nav-item" data-view="orders"><span>⇅</span><small>Orders</small></button><button class="nav-item" data-view="journal"><span>✎</span><small>Journal</small></button><button class="nav-item" data-view="coach"><span>✦</span><small>Coach</small></button><button class="nav-item" data-view="account"><span>♛</span><small>Account</small></button></nav>
+</div>
+
+<div id="authModal" class="auth-modal open" aria-hidden="false">
+  <div class="auth-backdrop"></div>
+  <section class="auth-panel" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="auth-brand"><div class="brand-mark">P</div><div><span class="eyebrow">PURPLE PAPER NETWORK</span><h2 id="authTitle">Welcome to Trading Arena</h2></div></div>
+    <p id="authIntro">Sign in to your Purple Paper account. If this is the first account on this installation, signing up creates the protected Owner account.</p>
+    <div class="auth-tabs"><button id="authLoginTab" class="active" type="button">LOG IN</button><button id="authSignupTab" type="button">SIGN UP</button></div>
+    <form id="authForm">
+      <label>Username<input id="authUsername" autocomplete="username" minlength="3" maxlength="32" placeholder="Your username" required></label>
+      <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" maxlength="128" placeholder="At least 8 characters" required></label><label id="ownerSetupCodeWrap" class="hidden">Owner setup code<input id="ownerSetupCode" type="password" maxlength="256" autocomplete="off" placeholder="Code from hosted server settings"></label>
+      <div id="authMessage" class="auth-message">Checking Purple Paper account status…</div>
+      <button id="authSubmit" class="trade-button" type="submit">LOG IN</button>
+    </form>
+    <div class="auth-security"><b>PURPLE PAPER NETWORK ACCOUNT</b><span>Your password is never stored as plain text. The first account created on a fresh hosted database becomes the protected Owner. The same account can be used from any device connected to that server.</span></div>
+  </section>
+</div>
+
+<div id="marketModal" class="market-modal" aria-hidden="true">
+  <div class="market-modal-backdrop" data-close-market></div>
+  <section class="market-setup" role="dialog" aria-modal="true" aria-labelledby="marketSetupTitle">
+    <div class="market-setup-head">
+      <div><span class="eyebrow">LIVE MARKET CONNECTION</span><h2 id="marketSetupTitle">Market Data Setup</h2><p>Connect Purple Paper to real stock and 24/7 crypto quotes. This connection is read-only for market data; every Purple Paper trade remains fake and local.</p></div>
+      <button id="closeMarketSetup" class="icon-button" type="button" aria-label="Close market data setup">×</button>
+    </div>
+    <div class="market-provider">
+      <div class="provider-mark">A</div><div><b>Alpaca Market Data</b><span>Real-time U.S. stocks + 24/7 crypto • IEX free tier supported</span></div><span id="marketConfigState" class="market-config-state">NOT CONFIGURED</span>
+    </div>
+    <form id="marketSetupForm">
+      <label>API Key<input id="alpacaApiKey" type="text" autocomplete="off" spellcheck="false" placeholder="Paste your Alpaca API key"></label>
+      <label>Secret Key<div class="secret-wrap"><input id="alpacaSecretKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your Alpaca secret key"><button id="toggleSecret" type="button">SHOW</button></div></label>
+      <label>Market Feed<select id="alpacaFeed"><option value="iex">IEX • Free real-time feed</option><option value="sip">SIP • Consolidated feed (subscription required)</option></select></label>
+      <div class="market-security"><b>LOCAL CREDENTIAL STORAGE</b><span>Your keys are saved only in Purple Paper's local <code>.env</code> file on this computer. They are not placed in the browser or sent anywhere except Alpaca for authentication.</span></div>
+      <div id="marketSetupMessage" class="market-setup-message">Enter your keys, then press Save & Test.</div>
+      <div class="market-setup-actions"><button id="testExistingFeed" class="secondary-button" type="button">TEST CURRENT CONNECTION</button><button id="saveMarketData" class="trade-button" type="submit">SAVE & TEST</button></div>
+    </form>
+  </section>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
