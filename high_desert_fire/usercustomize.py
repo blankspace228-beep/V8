@@ -1,3 +1,6 @@
 # Python imports usercustomize automatically after sitecustomize.
-# Keep optional business modules isolated from the original app bootstrap.
+# If DATABASE_URL is configured, switch all application modules to PostgreSQL
+# before loading the higher-level business operations package.
+import db_postgres
+db_postgres.activate()
 import business_ops
