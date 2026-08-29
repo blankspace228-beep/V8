@@ -14,7 +14,8 @@ async function useful(){if(!challenge||usefulSent)return;usefulSent=true;try{let
 async function fresh(){challenge=await api('/api/mining/challenge',{method:'POST'});nonce=0;usefulSent=false;log(`Challenge #${challenge.height} • ${challenge.difficulty_bits} bits • reward ${challenge.reward_ppc||1} PPC`);useful()}
 async function loop(){if(!running)return;try{if(!challenge)await fresh();const batch=25000,d=await api('/api/mining/mine',{method:'POST',body:JSON.stringify({challenge:challenge.challenge,nonce_start:nonce,attempts:batch})});hashes+=d.attempts||batch;$('#pmHashes').textContent=hashes.toLocaleString();energy();if(d.found){log(`BLOCK FOUND! +${d.reward_ppc} PPC • #${d.height} • ${d.block_hash.slice(0,18)}…`);challenge=null;await refresh()}else nonce=d.next_nonce;setTimeout(loop,25)}catch(e){log(e.message);challenge=null;setTimeout(loop,1000)}}
 async function toggle(){running=!running;const b=$('#pmBtn');b.textContent=running?'STOP MINING':'START MINING';b.classList.toggle('stop',running);if(running){hashes=0;t0=Date.now();challenge=null;loop()}else energy()}
-function init(){css();nav();mount()}
+function loadWorld(){if(document.getElementById('ppWorldLoader'))return;const s=document.createElement('script');s.id='ppWorldLoader';s.src='/static/v101_world.js?v=1';document.body.appendChild(s)}
+function init(){css();nav();mount();loadWorld()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,350));else setTimeout(init,350);
 setInterval(()=>{nav();if(!$('#ppMining'))mount()},2000);
 })();
