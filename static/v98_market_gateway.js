@@ -23,14 +23,19 @@
     document.head.appendChild(s);
   }
   function card(c){
+    const provider=$('.market-provider');
+    if(!provider)return;
     let el=$('#ppMarketGatewayCard');
     if(!el){
       el=document.createElement('section');el.id='ppMarketGatewayCard';el.className='pp-gateway-card';
-      const provider=$('.market-provider');provider?.insertAdjacentElement('afterend',el);
+      provider.insertAdjacentElement('afterend',el);
     }
     const live=!!c.connected;
+    const stateKey=[live,c.feed,c.can_configure,c.configured].join('|');
+    if(el.dataset.stateKey===stateKey)return;
+    el.dataset.stateKey=stateKey;
     el.innerHTML=`<div class="pp-gateway-top"><div class="pp-gateway-id"><i class="pp-gateway-dot ${live?'live':''}"></i><div><h3>Central Market Data Gateway</h3><p>One server-side Alpaca connection supplies live market data to every Purple Paper account.</p></div></div><span class="pp-gateway-badge ${live?'live':''}">${live?'LIVE':'RECONNECTING'}</span></div><div class="pp-gateway-grid"><div><span>PROVIDER</span><b>Alpaca Market Data</b></div><div><span>FEED</span><b>${esc(String(c.feed||'iex').toUpperCase())}</b></div><div><span>ACCESS</span><b>Server managed</b></div></div><div class="pp-gateway-actions"><button type="button" id="ppGatewayTest">TEST SERVER FEED</button></div><p class="pp-gateway-note">${c.can_configure?'Owner view: credentials are stored on the Purple Paper server and are never sent to player browsers.':'Live market credentials are managed by Purple Paper. No Alpaca account or API key is required for players.'}</p>`;
-    $('#ppGatewayTest')?.addEventListener('click',testFeed,{once:true});
+    $('#ppGatewayTest')?.addEventListener('click',testFeed);
   }
   async function testFeed(){
     const b=$('#ppGatewayTest');if(b){b.disabled=true;b.textContent='TESTING…';}
@@ -44,19 +49,19 @@
   }
   function apply(c){
     if(!c)return;last=c;ensureStyles();card(c);
-    const title=$('#marketSetupTitle');if(title)title.textContent='Central Market Feed';
-    const head=$('.market-setup-head p');if(head)head.textContent='Purple Paper uses one protected server-side market connection for stocks and 24/7 crypto. Players never need to enter an Alpaca key.';
-    const state=$('#marketConfigState');if(state){state.textContent=c.connected?'SERVER LIVE':c.configured?'SERVER READY':'NOT CONFIGURED';state.classList.toggle('live',!!c.connected);}
-    const top=$('#dataSetupBtn');if(top){top.disabled=false;const span=top.querySelector('span');if(span)span.textContent=c.connected?'LIVE FEED':'MARKET FEED';top.title=c.connected?'Central Alpaca feed is live':'View central market feed status';}
+    const title=$('#marketSetupTitle');if(title && title.textContent!=='Central Market Feed')title.textContent='Central Market Feed';
+    const head=$('.market-setup-head p');const copy='Purple Paper uses one protected server-side market connection for stocks and 24/7 crypto. Players never need to enter an Alpaca key.';if(head && head.textContent!==copy)head.textContent=copy;
+    const state=$('#marketConfigState');if(state){const t=c.connected?'SERVER LIVE':c.configured?'SERVER READY':'NOT CONFIGURED';if(state.textContent!==t)state.textContent=t;state.classList.toggle('live',!!c.connected);}
+    const top=$('#dataSetupBtn');if(top){top.disabled=false;const span=top.querySelector('span');const t=c.connected?'LIVE FEED':'MARKET FEED';if(span&&span.textContent!==t)span.textContent=t;top.title=c.connected?'Central Alpaca feed is live':'View central market feed status';}
     const form=$('#marketSetupForm');
     if(c.configured && form)form.classList.add('pp-managed-hidden');
     else if(form && c.can_configure)form.classList.remove('pp-managed-hidden');
-    const setup=$('#chartSetupBtn');if(setup){setup.textContent='CHECK LIVE FEED';setup.style.display=c.configured?'none':'inline-block';}
+    const setup=$('#chartSetupBtn');if(setup){if(setup.textContent!=='CHECK LIVE FEED')setup.textContent='CHECK LIVE FEED';setup.style.display=c.configured?'none':'inline-block';}
     ['#alpacaApiKey','#alpacaSecretKey','#toggleSecret'].forEach(s=>{const e=$(s);if(e && !c.can_configure)e.closest('label,div')?.classList.add('pp-managed-hidden');});
   }
   async function sync(){const c=await getConfig();if(c)apply(c);}
-  const observer=new MutationObserver(()=>{if(last)apply(last);});
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(sync,900);setInterval(sync,20000);
+  document.addEventListener('click',e=>{if(e.target.closest('#dataSetupBtn,#chartSetupBtn'))setTimeout(()=>{if(last)apply(last);else sync();},50);});
+  setTimeout(sync,900);
+  setInterval(sync,20000);
   window.PurpleMarketGateway={sync,testFeed};
 })();
