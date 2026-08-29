@@ -123,3 +123,6 @@ def register(app,base):
         except Exception:
             c.rollback();c.close();raise
         c.close();return {'found':True,'height':int(ch['height']),'block_hash':bh,'nonce':nonce,'reward_ppc':reward,'status':status_for(uid)}
+
+    from .v101_world import register as register_world
+    register_world(app,base)
