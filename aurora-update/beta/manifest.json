@@ -33,6 +33,6 @@
   "builder_url": "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/build_AuroraAI_update_v29.bat",
   "source_package_sha256": "2fb046dbefacd3ce0f11fa6363bd885abc56dc57f86b47337f4b0a3e4469edb1",
   "source_sha256": "b40ada47ae846e80c6a8f9f78b90d5d7bdc071dc91a0b947bcdb80502dae9aa5",
-  "builder_sha256": "a9b209f97edff4ad9dabfc99f41fd8b873fcd187c262f4cb8bf26c9818123b4d",
+  "builder_sha256": "f7dba992a802d4b9eaa31e0f4f82e7159e8caf4a0c1ff1020faf1393664e7865",
   "notes": "Automatic beta updater, in-app Updates page, dual SHA-256 verification, chunked compressed update packages, staged local build, automatic restart, and startup rollback protection."
 }
