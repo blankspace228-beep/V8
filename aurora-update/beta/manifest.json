@@ -5,7 +5,7 @@
   "source_filename": "AuroraAI_v29_auto_update.pyw",
   "builder_filename": "build_AuroraAI_update_v29.bat",
   "source_format": "gzip-base64",
-  "source_url": "",
+  "source_url": "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part01",
   "source_parts": [
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part01",
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part02",
@@ -20,8 +20,12 @@
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part11",
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part12",
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part13",
-    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part14",
-    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part15",
+    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part14a",
+    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part14b",
+    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part14c",
+    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part15a",
+    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part15b",
+    "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part15c",
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part16",
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part17",
     "https://raw.githubusercontent.com/blankspace228-beep/V8/main/aurora-update/beta/AuroraAI_v29_payload.part18"
