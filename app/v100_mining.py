@@ -35,6 +35,11 @@ def register(app,base):
         c.commit();c.close()
     ensure()
 
+    def auth_uid(request:Request):
+        try:return int(base.current_user_id(request))
+        except HTTPException:raise
+        except Exception:raise HTTPException(401,'Login required')
+
     def leading_zero_bits(raw:bytes):
         n=0
         for b in raw:
@@ -47,13 +52,12 @@ def register(app,base):
         return (float(row['minted']),int(row['max_supply'])) if row else (0.0,CAP)
 
     def reward_for_height(height:int):
-        # Predictable declining issuance inspired by Bitcoin, while respecting Purple's 10k cap.
         era=max(0,(height-1)//HALVING_INTERVAL)
         return max(0.0625,1.0/(2**era))
 
     def network_bits(c):
         st=c.execute('SELECT * FROM ppc_mining_state WHERE id=1').fetchone();bits=int(st['difficulty_bits'] or BASE_BITS);height=int(st['height'])
-        if height<RETARGET_BLOCKS or height%RETARGET_BLOCKS: return max(BASE_BITS,min(MAX_BITS,bits))
+        if height<RETARGET_BLOCKS or height%RETARGET_BLOCKS:return max(BASE_BITS,min(MAX_BITS,bits))
         rows=c.execute('SELECT created_ts FROM ppc_mined_blocks WHERE created_ts>0 ORDER BY height DESC LIMIT ?',(RETARGET_BLOCKS,)).fetchall()
         if len(rows)<RETARGET_BLOCKS:return bits
         newest=int(rows[0]['created_ts']);oldest=int(rows[-1]['created_ts']);actual=max(1,newest-oldest);target=TARGET_BLOCK_SECONDS*(RETARGET_BLOCKS-1)
@@ -70,15 +74,11 @@ def register(app,base):
 
     @app.get('/api/mining/status')
     def mining_status(request:Request):
-        u=base.current_user(request)
-        if not u:raise HTTPException(401,'Login required')
-        return status_for(int(u['id']))
+        return status_for(auth_uid(request))
 
     @app.post('/api/mining/challenge')
     def mining_challenge(request:Request):
-        u=base.current_user(request)
-        if not u:raise HTTPException(401,'Login required')
-        ensure();uid=int(u['id']);c=base.db();st=c.execute('SELECT * FROM ppc_mining_state WHERE id=1').fetchone();minted,cap=supply(c)
+        ensure();uid=auth_uid(request);c=base.db();st=c.execute('SELECT * FROM ppc_mining_state WHERE id=1').fetchone();minted,cap=supply(c)
         if minted>=cap:c.close();raise HTTPException(409,'All PPC has been issued')
         bits=network_bits(c);challenge=secrets.token_hex(24);exp=int(time.time())+300
         c.execute('DELETE FROM ppc_mining_challenges WHERE user_id=? OR expires_at<?',(uid,int(time.time())))
@@ -87,11 +87,8 @@ def register(app,base):
 
     @app.post('/api/mining/useful-work')
     def useful_work(req:UsefulReq,request:Request):
-        u=base.current_user(request)
-        if not u:raise HTTPException(401,'Login required')
-        uid=int(u['id']);c=base.db();ch=c.execute('SELECT * FROM ppc_mining_challenges WHERE challenge=? AND user_id=?',(req.challenge,uid)).fetchone()
+        uid=auth_uid(request);c=base.db();ch=c.execute('SELECT * FROM ppc_mining_challenges WHERE challenge=? AND user_id=?',(req.challenge,uid)).fetchone()
         if not ch or ch['used'] or int(ch['expires_at'])<int(time.time()):c.close();raise HTTPException(409,'Challenge expired')
-        # Deterministic market-simulation statistic: volatility/risk work that is cheap for the server to verify.
         vals=[float(x) for x in req.values if math.isfinite(float(x))]
         if len(vals)<32:c.close();raise HTTPException(400,'At least 32 finite samples required')
         mean=sum(vals)/len(vals);variance=sum((x-mean)**2 for x in vals)/len(vals);score=math.sqrt(variance)
@@ -102,9 +99,7 @@ def register(app,base):
 
     @app.post('/api/mining/mine')
     def mine(req:MineReq,request:Request):
-        u=base.current_user(request)
-        if not u:raise HTTPException(401,'Login required')
-        ensure();uid=int(u['id']);c=base.db();ch=c.execute('SELECT * FROM ppc_mining_challenges WHERE challenge=? AND user_id=?',(req.challenge,uid)).fetchone()
+        ensure();uid=auth_uid(request);c=base.db();ch=c.execute('SELECT * FROM ppc_mining_challenges WHERE challenge=? AND user_id=?',(req.challenge,uid)).fetchone()
         if not ch or ch['used'] or int(ch['expires_at'])<int(time.time()):c.close();raise HTTPException(409,'Mining challenge expired or invalid')
         st=c.execute('SELECT * FROM ppc_mining_state WHERE id=1').fetchone()
         if int(ch['height'])!=int(st['height'])+1 or ch['prev_hash']!=st['last_hash']:c.close();raise HTTPException(409,'A newer block was found. Get a fresh challenge.')
