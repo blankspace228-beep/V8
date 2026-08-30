@@ -15,7 +15,7 @@
         const d=await api('/api/auth/account-vault');
         if(d.capsule)localStorage.setItem(KEY,JSON.stringify({capsule:d.capsule,username:d.username,saved:Date.now()}));
       }
-      if(msg)msg.innerHTML=`<b>Remembered.</b> ${savedLabel()}<br><span style="opacity:.72">Your password and Owner Setup Code are never stored in browser recovery.</span>`;
+      if(msg)msg.innerHTML=`<b>Remembered.</b> ${savedLabel()}<br><span style="opacity:.72">Your password is never stored in browser recovery.</span>`;
     }catch(e){if(msg)msg.textContent=e.message||'Could not remember this account.'}
     finally{if(btn){btn.disabled=false;btn.textContent='REMEMBER THIS ACCOUNT'}}
   }
@@ -28,33 +28,30 @@
     document.getElementById('ppAccountSettingsCard')?.remove();
 
     const card=document.createElement('section');card.id='ppAccountSettingsCard';card.className='card';card.style.cssText='margin-top:18px;padding:22px;max-width:980px';
-    let ownerBody='';
+    const ownerAllowed=!!(st.is_owner||st.can_claim);
+    let ownerSection='';
     if(st.is_owner){
-      ownerBody=`<div style="display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><span class="eyebrow">OWNER ACCESS</span><h2 style="margin:6px 0">Owner Active</h2><p style="margin:0;opacity:.78">This server currently recognizes <b>${esc(st.locked_to||st.current_username)}</b> as Owner.</p></div><span class="paper-tag">OWNER ACTIVE</span></div>`;
+      ownerSection=`<div style="padding:18px;border:1px solid rgba(151,91,255,.22);border-radius:14px;background:linear-gradient(180deg,rgba(122,70,210,.07),rgba(255,255,255,.015))"><div style="display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><span class="eyebrow">OWNER ACCESS</span><h2 style="margin:6px 0">Owner Active</h2><p style="margin:0;opacity:.78">This server recognizes <b>${esc(st.locked_to||st.current_username)}</b> as Owner.</p></div><span class="paper-tag">OWNER ACTIVE</span></div></div>`;
     } else if(st.can_claim){
-      ownerBody=`<div><span class="eyebrow">OWNER ACCESS</span><h2 style="margin:6px 0">Enter Owner Setup Code</h2><p style="opacity:.78">This account matches the reserved Owner username <b>${esc(st.reserved_username)}</b>. Enter your private code here to activate Owner controls.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:15px"><input id="ownerClaimCode" type="password" autocomplete="new-password" spellcheck="false" placeholder="Owner Setup Code" style="min-width:280px;flex:1;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#0d0912;color:white"><button id="ownerClaimBtn" class="trade-button" type="button">ACTIVATE OWNER</button></div><div id="ownerClaimMsg" style="margin-top:10px;min-height:22px;opacity:.8"></div></div>`;
-    } else if(st.claimed){
-      ownerBody=`<div><span class="eyebrow">OWNER ACCESS</span><h2 style="margin:6px 0">Owner already assigned</h2><p style="margin:0;opacity:.78">The current server database is assigned to <b>${esc(st.locked_to)}</b>.</p></div>`;
-    } else {
-      ownerBody=`<div><span class="eyebrow">OWNER ACCESS</span><h2 style="margin:6px 0">Reserved Owner account</h2><p style="margin:0;opacity:.78">Owner activation is reserved for <b>${esc(st.reserved_username)}</b>. You are signed in as <b>${esc(st.current_username)}</b>.</p></div>`;
+      ownerSection=`<div style="padding:18px;border:1px solid rgba(151,91,255,.22);border-radius:14px;background:linear-gradient(180deg,rgba(122,70,210,.07),rgba(255,255,255,.015))"><div><span class="eyebrow">OWNER ACCESS</span><h2 style="margin:6px 0">Enter Owner Setup Code</h2><p style="opacity:.78">This reserved Owner account can activate private Owner controls.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:15px"><input id="ownerClaimCode" type="password" autocomplete="new-password" spellcheck="false" placeholder="Owner Setup Code" style="min-width:280px;flex:1;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#0d0912;color:white"><button id="ownerClaimBtn" class="trade-button" type="button">ACTIVATE OWNER</button></div><div id="ownerClaimMsg" style="margin-top:10px;min-height:22px;opacity:.8"></div></div></div>`;
     }
 
     card.innerHTML=`
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:18px;margin-bottom:20px">
-        <div><span class="eyebrow">ACCOUNT SETTINGS</span><h1 style="margin:6px 0 5px;font-size:26px">Account & Security</h1><p style="margin:0;opacity:.72">Signed in as <b>${esc(st.current_username)}</b>. Manage Owner access and account recovery here.</p></div>
+        <div><span class="eyebrow">ACCOUNT SETTINGS</span><h1 style="margin:6px 0 5px;font-size:26px">Account & Security</h1><p style="margin:0;opacity:.72">Signed in as <b>${esc(st.current_username)}</b>. ${ownerAllowed?'Manage your private account and Owner access here.':'Manage your account and sign-in settings here.'}</p></div>
         <span class="paper-tag">${st.is_owner?'OWNER':'PLAYER'}</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:18px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:${ownerAllowed?'18px':'0'}">
         <div style="padding:17px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.018)">
           <span class="eyebrow">REMEMBER ACCOUNT</span><h3 style="margin:6px 0 8px">Stay signed in on this browser</h3><p style="margin:0 0 14px;opacity:.72;line-height:1.45">Purple Paper uses a long-lived secure session and a signed browser recovery capsule so reloads and normal revisits remember your account.</p>
           <button id="accountRememberBtn" class="secondary-button" type="button">REMEMBER THIS ACCOUNT</button>
-          <div id="accountRememberMsg" style="margin-top:10px;font-size:12px;line-height:1.45;opacity:.82">${savedLabel()}<br><span style="opacity:.72">Passwords and Owner codes are not stored.</span></div>
+          <div id="accountRememberMsg" style="margin-top:10px;font-size:12px;line-height:1.45;opacity:.82">${savedLabel()}<br><span style="opacity:.72">Passwords are not stored.</span></div>
         </div>
         <div style="padding:17px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.018)">
-          <span class="eyebrow">SESSION</span><h3 style="margin:6px 0 8px">Persistent sign-in</h3><p style="margin:0;opacity:.72;line-height:1.45">Successful logins use the site's extended session. If the temporary server database is ever replaced, the remembered-account recovery control can rebuild your login identity.</p>
+          <span class="eyebrow">SESSION</span><h3 style="margin:6px 0 8px">Persistent sign-in</h3><p style="margin:0;opacity:.72;line-height:1.45">Successful logins use the site's extended session and account recovery system.</p>
         </div>
       </div>
-      <div style="padding:18px;border:1px solid rgba(151,91,255,.22);border-radius:14px;background:linear-gradient(180deg,rgba(122,70,210,.07),rgba(255,255,255,.015))">${ownerBody}</div>`;
+      ${ownerSection}`;
     host.appendChild(card);
 
     document.getElementById('accountRememberBtn')?.addEventListener('click',rememberNow);
